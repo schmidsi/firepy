@@ -1,49 +1,28 @@
+# The MIT License
+# 
+# Copyright (c) 2009 Sung-jin Hong <serialx@serialx.net>
+# Many code here derived from:
+# http://code.cmlenz.net/diva/browser/trunk/diva/ext/firephp.py
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
 import simplejson as json
-
-
-def _extract_traceback(tb):
-    frames = []
-    while tb:
-        tb_frame = tb.tb_frame
-        f_locals = tb_frame.f_locals
-        f_code = tb_frame.f_code
-        frames.append({
-            'filename': f_code.co_filename,
-            'lineno': tb.tb_lineno,
-            'locals': f_locals,
-            'name': f_code.co_name,
-            'args': [
-                #f_code.co_varnames[i] for i in range(f_code.co_argcount)
-                f_locals.get(f_code.co_varnames[i]) for i in range(f_code.co_argcount)
-            ],
-            'hide': tb_frame.f_locals.get('__traceback_hide__')
-        })
-        tb = tb.tb_next
-    return frames
-
-def _filter_traceback(frames):
-    hidden = False
-    retval = []
-    for idx, frame in enumerate(frames):
-        hide = frame['hide']
-        if hide in ('before', 'before_and_this'):
-            del retval[:]
-            hidden = False
-            if hide == 'before_and_this':
-                continue
-        elif hide in ('reset', 'reset_and_this'):
-            hidden = False
-            if hide == 'reset_and_this':
-                continue
-        elif hide in ('after', 'after_and_this'):
-            hidden = True
-            if hide == 'after_and_this':
-                continue
-        elif hidden:
-            continue
-        if not hide:
-            retval.append(frame)
-    return retval
 
 
 def _extract_traceback(tb):
