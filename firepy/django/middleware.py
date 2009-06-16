@@ -22,8 +22,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from django.db import connection
 import logging
+
+from django.db import connection
+from django.conf import settings
 import simplejson as json
 
 from firepy.loghandler import FirePHPHandler
@@ -45,6 +47,9 @@ class FirePHPMiddleware():
         FirePHPHandler.logs = []
 
     def process_response(self, request, response):
+        # Ignore the static media file requests
+        if request.META['PATH_INFO'].startswith(settings.MEDIA_URL):
+            return response
         # Calculate db times
         time = 0.0
         for q in connection.queries:
