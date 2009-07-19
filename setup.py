@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
         name='firepy',
-        version='0.1.4',
+        version='0.1.5',
         description='FirePHP for Python',
         long_description=('This is a python server library for FirePHP '
                           'supporting python built-in logging facility '

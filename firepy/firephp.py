@@ -154,7 +154,7 @@ class FirePHP(object):
         def encode_robust(obj):
             return repr(obj)
         index = 1
-        for log in enumerate(logs):
+        for log in logs:
             code = json.dumps(log, default=encode_robust)
             if len(code) >= HEADER_SIZE_MAX:  # Too large header for firefox, split it
                 cut = code[:HEADER_SIZE_MAX]
