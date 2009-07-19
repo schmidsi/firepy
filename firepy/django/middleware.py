@@ -48,7 +48,7 @@ class FirePHPMiddleware():
 
     def process_response(self, request, response):
         # Ignore the static media file requests
-        if request.META['PATH_INFO'].startswith(settings.MEDIA_URL):
+        if settings.MEDIA_URL and request.META['PATH_INFO'].startswith(settings.MEDIA_URL):
             return response
         # Calculate db times
         time = 0.0
