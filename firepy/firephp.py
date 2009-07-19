@@ -22,7 +22,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import simplejson as json
+try:
+    # Try import from json module in python 2.6>
+    import json
+except ImportError:
+    try:
+        # Try import from django
+        from django.utils import simplejson as json
+    except ImportError:
+        import simplejson as json
+
+
+# Max size of eash headers. Exists because Firefox has limits (5000)
+HEADER_SIZE_MAX = 4000
 
 
 def _extract_traceback(tb):
@@ -141,9 +153,26 @@ class FirePHP(object):
     def generate_headers(cls, logs):
         def encode_robust(obj):
             return repr(obj)
-        index = 0
-        for i, log in enumerate(logs):
+        index = 1
+        for log in enumerate(logs):
             code = json.dumps(log, default=encode_robust)
-            yield ('X-Wf-1-1-1-%d' % i, '%d|%s|' % (len(code), code))
-            index = i
-        yield ('X-Wf-1-Index', str(index))
+            if len(code) >= HEADER_SIZE_MAX:  # Too large header for firefox, split it
+                cut = code[:HEADER_SIZE_MAX]
+                rest = code[HEADER_SIZE_MAX:]
+                yield ('X-Wf-1-1-1-%d' % index, '%d|%s|\\' % (len(code), cut))
+                index += 1
+                while True:
+                    cut = rest[:HEADER_SIZE_MAX]
+                    rest = rest[HEADER_SIZE_MAX:]
+                    if rest:  # If it's not the end
+                        yield ('X-Wf-1-1-1-%d' % index, '|%s|\\' % (cut))
+                        index += 1
+                    else:  # If it's the end
+                        yield ('X-Wf-1-1-1-%d' % index, '|%s|' % (cut))
+                        index += 1
+                        break
+
+            else:
+                yield ('X-Wf-1-1-1-%d' % index, '%d|%s|' % (len(code), code))
+                index += 1
+        yield ('X-Wf-1-Index', str(index - 1))

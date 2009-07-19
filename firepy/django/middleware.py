@@ -24,9 +24,8 @@
 
 import logging
 
-from django.db import connection
 from django.conf import settings
-import simplejson as json
+from django.db import connection
 
 from firepy.loghandler import FirePHPHandler
 from firepy.firephp import FirePHP
@@ -50,6 +49,9 @@ class FirePHPMiddleware():
         # Ignore the static media file requests
         if settings.MEDIA_URL and request.META['PATH_INFO'].startswith(settings.MEDIA_URL):
             return response
+        if not settings.MEDIA_URL:
+            logging.warn('Please set MEDIA_URL to filter out unncessary FirePHP logs.')
+
         # Calculate db times
         time = 0.0
         for q in connection.queries:
