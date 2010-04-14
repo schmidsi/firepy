@@ -1,0 +1,17 @@
+firepy - a git clone of the python based firephp implementation
+===============================================================
+
+original page: http://code.google.com/p/firepy/
+original svn source: http://firepy.googlecode.com/svn/trunk/
+
+Documentation
+-------------
+
+best to read the original documentation:
+http://code.google.com/p/firepy/wiki/Documentation
+
+Installation
+------------
+
+* install the FirePHP Plugin for Firebug: http://www.firephp.org/
+* integrate firepy in your django project
