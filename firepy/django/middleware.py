@@ -37,7 +37,10 @@ class FirePHPMiddleware():
     def __init__(self):
         # Set the FirePHP log handler to the root logger.
         firephp = FirePHPHandler()
-        firephp.setLevel(logging.DEBUG)
+        if settings.DEBUG:
+            firephp.setLevel(logging.DEBUG)
+        else:
+            firephp.setLevel(logging.ERROR)
         logging.root.setLevel(logging.DEBUG)
         logging.root.addHandler(firephp)
 
@@ -49,6 +52,10 @@ class FirePHPMiddleware():
         # Ignore the static media file requests
         if settings.MEDIA_URL and request.META['PATH_INFO'].startswith(settings.MEDIA_URL):
             return response
+        # Only give debug infos to local ips and if debug = true
+        if not settings.DEBUG and request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS:
+            return response
+        
         if not settings.MEDIA_URL:
             logging.warn('Please set MEDIA_URL to filter out unncessary FirePHP logs.')
 
